@@ -6,4 +6,4 @@ spring:
     url: jdbc:mysql://localhost:3306/wms?serverTimezone=Asia/Shanghai&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useSSL=false&failOverReadOnly=false
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: wodeQfeima110
+    password: root

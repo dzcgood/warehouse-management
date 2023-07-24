@@ -74,8 +74,8 @@ public class UserController {
      * @return
      */
     @GetMapping("delete")
-    public boolean saveOrMod(Integer id) {
-        return userService.removeById(id);
+    public Result saveOrMod(Integer id) {
+        return userService.removeById(id) ? Result.suc(null, null) : Result.fail();
     }
 
     /**

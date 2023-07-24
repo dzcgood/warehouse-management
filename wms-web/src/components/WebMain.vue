@@ -50,8 +50,10 @@
       </el-table-column>
       <el-table-column prop="operate" label="操作">
         <template slot-scope="scope">
-          <el-button type="success" size="small" @click="mod(scope.row)">编辑</el-button>
-          <el-button type="danger" size="small" @click="del">删除</el-button>
+          <el-button type="success" size="small" @click="mod(scope.row)" style="margin-right: 5px">编辑</el-button>
+          <el-popconfirm title="确定删除吗？" @confirm="del(scope.row.id)">
+            <el-button slot="reference" type="danger" size="small">删除</el-button>
+          </el-popconfirm>
         </template>
       </el-table-column>
     </el-table>
@@ -119,18 +121,18 @@ export default {
   name: "WebMain",
   data() {
     let checkAge = (rule, value, callback) => {
-      if(value > 150) {
+      if (value > 150) {
         callback(new Error('年龄输入过大'));
       } else {
         callback();
       }
     };
     let checkDuplicate = (rule, value, callback) => {
-      if(this.form.id) {
+      if (this.form.id) {
         return callback();
       }
       this.$axios.get(this.$httpUrl + '/user/findByNo?no=' + this.form.no).then(res => res.data).then(res => {
-        if(res.code == 200) {
+        if (res.code == 200) {
           // 根据no查到了数据
           callback(new Error('账号已经存在'));
         } else {
@@ -239,7 +241,6 @@ export default {
       })
     },
     mod(row) {
-      console.log(row)
       // 展示表单
       this.centerDialogVisible = true
       this.$nextTick(() => {
@@ -254,8 +255,24 @@ export default {
         this.form.roleId = row.roleId
       })
     },
-    del() {
-      console.log("del")
+    del(id) {
+      this.$axios.get(this.$httpUrl + '/user/delete?id=' + id)
+          .then(res => res.data)
+          .then(res => {
+            console.log(res)
+            if (res.code == 200) {
+              this.$message({
+                message: '操作成功',
+                type: 'success'
+              });
+              this.loadPost()
+            } else {
+              this.$message({
+                message: '操作失败',
+                type: 'error'
+              });
+            }
+          })
     },
     resetForm() {
       this.$refs.form.resetFields();
@@ -303,7 +320,7 @@ export default {
     save() {
       this.$refs.form.validate((valid) => {
         if (valid) {
-          if(this.form.id) {
+          if (this.form.id) {
             this.doMod();
           } else {
             this.doSave();

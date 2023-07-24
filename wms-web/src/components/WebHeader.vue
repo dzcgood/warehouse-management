@@ -21,6 +21,7 @@
 <script>
   export default {
     name: "WebHeader",
+
     methods: {
       toUser() {
         console.log("toUser....")
@@ -30,6 +31,7 @@
         console.log("logOut....")
       }
     },
+
 
   }
 </script>

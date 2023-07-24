@@ -83,10 +83,10 @@ public class UserController {
      * @return
      */
     @PostMapping("listP")
-    public List<User> listP(@RequestBody User user) {
+    public Result listP(@RequestBody User user) {
         LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.like(User::getName, user.getName());
-        return userService.list(lambdaQueryWrapper);
+        return Result.suc(null, userService.list(lambdaQueryWrapper));
     }
 
     /**

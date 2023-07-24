@@ -43,8 +43,8 @@ public class UserController {
      * @return
      */
     @PostMapping("save")
-    public boolean save(@RequestBody User user) {
-        return userService.save(user);
+    public Result save(@RequestBody User user) {
+        return userService.save(user) ? Result.suc(null, null) : Result.fail();
     }
 
     /**
@@ -148,6 +148,17 @@ public class UserController {
 
         IPage<User> result = userService.pageCC(page, lambdaQueryWrapper);
         return Result.suc(result.getTotal(), result.getRecords());
+    }
+
+    /**
+     * 根据no查找用户
+     * @param no
+     * @return
+     */
+    @GetMapping("findByNo")
+    public Result findByNo(@RequestParam String no) {
+        List<User> list = userService.lambdaQuery().eq(User::getNo, no).list();
+        return list.size() > 0 ? Result.suc(null, list) : Result.fail();
     }
 
 }

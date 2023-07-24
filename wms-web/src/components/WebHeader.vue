@@ -1,7 +1,7 @@
 <template>
   <div style="display: flex; line-height: 60px">
     <div>
-      <i class="el-icon-s-fold" style="font-size: 20px;line-height: 100%;"></i>
+      <i :class="icon_name" style="font-size: 20px;line-height: 100%; cursor: pointer" @click="collapse"></i>
     </div>
     <div style="flex: 1;text-align: center;font-size: 34px">
       <span>欢迎来到仓库管理系统</span>
@@ -29,8 +29,23 @@
 
       logOut() {
         console.log("logOut....")
+      },
+
+      collapse() {
+        if(this.icon_name === 'el-icon-s-fold') {
+          this.icon_name = 'el-icon-s-unfold'
+        } else {
+          this.icon_name = 'el-icon-s-fold'
+        }
+        this.$emit('doCollapse')
       }
     },
+
+    data() {
+      return {
+        icon_name: 'el-icon-s-fold'
+      }
+    }
 
 
   }

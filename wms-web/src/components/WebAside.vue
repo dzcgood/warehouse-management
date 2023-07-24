@@ -51,8 +51,6 @@
 <script>
   export default {
     name: "WebAside",
-    data() {
-      return
-    }
+
   }
 </script>

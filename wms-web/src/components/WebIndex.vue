@@ -5,7 +5,7 @@
     </el-aside>
 
     <el-container style="height: 100%">
-      <el-header style="text-align: right; font-size: 12px">
+      <el-header style="text-align: right; font-size: 12px; height: 100%; border-bottom: darkgray 1px solid">
         <WebHeader></WebHeader>
       </el-header>
 
@@ -20,7 +20,6 @@
 
 <style>
 .el-header {
-  background-color: #B3C0D1;
   color: #333;
   line-height: 60px;
 }
@@ -40,9 +39,6 @@ import WebHeader from "@/components/WebHeader";
 import WebMain from "@/components/WebMain";
 export default {
   name: "WebIndex",
-  components: {WebMain, WebHeader, WebAside},
-  data() {
-
-  }
+  components: {WebMain, WebHeader, WebAside}
 };
 </script>

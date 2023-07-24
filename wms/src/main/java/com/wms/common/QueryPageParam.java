@@ -33,5 +33,5 @@ public class QueryPageParam {
     /**
      * 前端传过来的其他参数
      */
-    private HashMap param;
+    private HashMap param = new HashMap();
 }

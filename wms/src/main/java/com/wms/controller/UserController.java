@@ -3,6 +3,7 @@ package com.wms.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wms.common.QueryPageParam;
 import com.wms.common.Result;
@@ -136,7 +137,14 @@ public class UserController {
         LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         HashMap param = queryPageParam.getParam();
         String name = (String)param.get("name");
-        lambdaQueryWrapper.like(User::getName, name == null ? "" : name);
+        Object sexObj = param.get("sex");
+
+        if(StringUtils.isNotBlank(name) && !"null".equals(name)) {
+            lambdaQueryWrapper.like(User::getName, name);
+        }
+        if(sexObj instanceof Integer) {
+            lambdaQueryWrapper.eq(User::getSex, sexObj);
+        }
 
         IPage<User> result = userService.pageCC(page, lambdaQueryWrapper);
         return Result.suc(result.getTotal(), result.getRecords());

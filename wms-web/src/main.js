@@ -6,7 +6,7 @@ import App from './App.vue';
 import '../public/global.css'
 import axios from "axios";
 
-Vue.use(ElementUI);
+Vue.use(ElementUI, {size: 'small'});
 Vue.prototype.$axios = axios;
 Vue.prototype.$httpUrl = 'http://localhost:8081'
 

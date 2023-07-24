@@ -53,8 +53,8 @@ public class UserController {
      * @return
      */
     @PostMapping("mod")
-    public boolean mod(@RequestBody User user) {
-        return userService.updateById(user);
+    public Result mod(@RequestBody User user) {
+        return userService.updateById(user) == true ? Result.suc(null, null) : Result.fail();
     }
 
     /**

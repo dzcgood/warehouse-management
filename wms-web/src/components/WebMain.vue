@@ -49,8 +49,10 @@
       <el-table-column prop="phone" label="电话" width="180">
       </el-table-column>
       <el-table-column prop="operate" label="操作">
-        <el-button type="success" size="small">编辑</el-button>
-        <el-button type="danger" size="small">删除</el-button>
+        <template slot-scope="scope">
+          <el-button type="success" size="small" @click="mod(scope.row)">编辑</el-button>
+          <el-button type="danger" size="small" @click="del">删除</el-button>
+        </template>
       </el-table-column>
     </el-table>
     <!--    分页-->
@@ -152,6 +154,7 @@ export default {
       }],
       centerDialogVisible: false,
       form: {
+        id: '',
         no: '',
         name: '',
         password: '',
@@ -235,30 +238,77 @@ export default {
         this.resetForm()
       })
     },
+    mod(row) {
+      console.log(row)
+      // 展示表单
+      this.centerDialogVisible = true
+      this.$nextTick(() => {
+        // 赋值到表单
+        this.form.id = row.id
+        this.form.no = row.no
+        this.form.name = row.name
+        this.form.password = row.password
+        this.form.age = row.age + ''
+        this.form.phone = row.phone
+        this.form.sex = row.sex + ''
+        this.form.roleId = row.roleId
+      })
+    },
+    del() {
+      console.log("del")
+    },
     resetForm() {
       this.$refs.form.resetFields();
+    },
+    doSave() {
+      this.$axios.post(this.$httpUrl + '/user/save', this.form)
+          .then(res => res.data)
+          .then(res => {
+            console.log(res)
+            if (res.code == 200) {
+              this.$message({
+                message: '操作成功',
+                type: 'success'
+              });
+              this.centerDialogVisible = false
+              this.loadPost()
+            } else {
+              this.$message({
+                message: '操作失败',
+                type: 'error'
+              });
+            }
+          })
+    },
+    doMod() {
+      this.$axios.post(this.$httpUrl + '/user/mod', this.form)
+          .then(res => res.data)
+          .then(res => {
+            console.log(res)
+            if (res.code == 200) {
+              this.$message({
+                message: '操作成功',
+                type: 'success'
+              });
+              this.centerDialogVisible = false
+              this.loadPost()
+            } else {
+              this.$message({
+                message: '操作失败',
+                type: 'error'
+              });
+            }
+          })
     },
     save() {
       this.$refs.form.validate((valid) => {
         if (valid) {
-          this.$axios.post(this.$httpUrl + '/user/save', this.form)
-              .then(res => res.data)
-              .then(res => {
-                console.log(res)
-                if (res.code == 200) {
-                  this.$message({
-                    message: '操作成功',
-                    type: 'success'
-                  });
-                  this.centerDialogVisible = false
-                  this.loadPost()
-                } else {
-                  this.$message({
-                    message: '操作失败',
-                    type: 'error'
-                  });
-                }
-              })
+          if(this.form.id) {
+            this.doMod();
+          } else {
+            this.doSave();
+          }
+
         } else {
           console.log('error submit!!');
           return false;

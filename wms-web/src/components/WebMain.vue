@@ -21,6 +21,26 @@
       return {
         tableData: Array(20).fill(item)
       }
+    },
+    methods: {
+      loadGet() {
+        this.$axios.get(this.$httpUrl + '/user/list')
+            .then(res => res.data)
+            .then(res => {
+            console.log(res)
+        })
+      },
+      loadPost() {
+        this.$axios.post(this.$httpUrl + '/user/listP', {"name": "张"})
+            .then(res => res.data)
+            .then(res => {
+              console.log(res)
+            })
+      },
+    },
+    beforeMount() {
+      // this.loadGet()
+      this.loadPost()
     }
   }
 </script>

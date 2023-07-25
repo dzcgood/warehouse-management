@@ -6,7 +6,7 @@
     <div style="flex: 1;text-align: center;font-size: 34px">
       <span>欢迎来到仓库管理系统</span>
     </div>
-    <span style="font-size: 15px">王小虎</span>
+    <span style="font-size: 15px">{{ user.name }}</span>
     <el-dropdown>
       <i class="el-icon-arrow-down" style="margin-left: 5px; font-size: 15px"></i>
       <el-dropdown-menu slot="dropdown">
@@ -19,34 +19,51 @@
 </template>
 
 <script>
-  export default {
-    name: "WebHeader",
+export default {
+  name: "WebHeader",
 
-    methods: {
-      toUser() {
-        console.log("toUser....")
-      },
-
-      logOut() {
-        console.log("logOut....")
-      },
-
-      collapse() {
-        if(this.icon_name === 'el-icon-s-fold') {
-          this.icon_name = 'el-icon-s-unfold'
-        } else {
-          this.icon_name = 'el-icon-s-fold'
-        }
-        this.$emit('doCollapse')
-      }
+  methods: {
+    toUser() {
+      console.log("toUser....")
     },
 
-    data() {
-      return {
-        icon_name: 'el-icon-s-fold'
+    logOut() {
+      console.log("logOut....")
+      this.$confirm('您确定要退出登录吗？', '提示', {
+        confirmButtonText: '确定',
+        type: 'warning',
+        center: true
+      })
+          .then(() => {
+            this.$router.push("/")
+            sessionStorage.clear()
+            this.$message({
+              type: 'success',
+              message: '退出登录成功'
+            })
+          })
+          .catch(() => {
+            // 什么都不做
+          })
+    },
+
+    collapse() {
+      if (this.icon_name === 'el-icon-s-fold') {
+        this.icon_name = 'el-icon-s-unfold'
+      } else {
+        this.icon_name = 'el-icon-s-fold'
       }
+      this.$emit('doCollapse')
     }
+  },
 
-
+  data() {
+    return {
+      icon_name: 'el-icon-s-fold',
+      user: JSON.parse(sessionStorage.getItem('CurUser'))
+    }
   }
+
+
+}
 </script>

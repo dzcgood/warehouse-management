@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * <p>
@@ -80,5 +81,15 @@ public class GoodsTypeController {
 
         IPage<GoodsType> result = goodsTypeService.pageCC(page, lambdaQueryWrapper);
         return Result.suc(result.getTotal(), result.getRecords());
+    }
+
+    /**
+     * 返回所有数据
+     * @return
+     */
+    @GetMapping("list")
+    public Result list() {
+        List<GoodsType> list = goodsTypeService.list();
+        return list.size() > 0 ? Result.suc(null, list) : Result.fail();
     }
 }

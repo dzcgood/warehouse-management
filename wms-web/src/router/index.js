@@ -19,6 +19,22 @@ const routes = [
                 },
                 component: ()=> import('../components/HomePage')
             },
+            {
+                path: '/AdminManage',
+                name: 'admin',
+                meta: {
+                    title: '管理员管理'
+                },
+                component: ()=> import('../components/admin/AdminManage')
+            },
+            {
+                path: '/UserManage',
+                name: 'user',
+                meta: {
+                    title: '用户管理'
+                },
+                component: ()=> import('../components/user/UserManage')
+            },
         ]
     }
 ]

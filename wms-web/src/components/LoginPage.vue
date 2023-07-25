@@ -54,18 +54,10 @@ export default {
             console.log(res)
             if (res.code == 200) {
               //存储
-              sessionStorage.setItem("CurUser", JSON.stringify(res.data))
+              sessionStorage.setItem("CurUser", JSON.stringify(res.data.user))
+              console.log(res.data.menuList)
+              this.$store.commit("setMenu", res.data.menuList)
               this.$router.replace('/WebIndex');
-              // this.$axios.get(this.$httpUrl + '/menu/list?roleId=' + res.data.roleId)
-              //     .then(res => res.data)
-              //     .then(res => {
-              //       console.log(res)
-              //       if (res.code == 200) {
-              //         // this.$store.commit("setMenu", res.data.menu)
-              //         //跳转到主页
-              //         this.$router.replace('/WebIndex');
-              //       }
-              //     });
 
             } else {
               this.confirm_disabled = false;

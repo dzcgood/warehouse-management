@@ -30,18 +30,14 @@
 
     data() {
       return {
-        menu: [
-          {
-            menuClick: 'AdminManage',
-            menuName: '管理员管理',
-            menuIcon: 'el-icon-s-custom'
-          },
-          {
-            menuClick: 'UserManage',
-            menuName: '用户管理',
-            menuIcon: 'el-icon-user'
-          }
-        ]
+
+      }
+    },
+    computed: {
+      "menu": {
+        get() {
+          return this.$store.state.menu
+        }
       }
     },
     props: {

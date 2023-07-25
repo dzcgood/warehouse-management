@@ -7,7 +7,9 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wms.common.QueryPageParam;
 import com.wms.common.Result;
+import com.wms.entity.Menu;
 import com.wms.entity.User;
+import com.wms.service.MenuService;
 import com.wms.service.UserService;
 import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,10 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private MenuService menuService;
+
 
     @GetMapping("list")
     public List<User> list() {
@@ -138,12 +144,18 @@ public class UserController {
         HashMap param = queryPageParam.getParam();
         String name = (String)param.get("name");
         Object sexObj = param.get("sex");
+        Object roleIdObj = param.get("roleId");
 
         if(StringUtils.isNotBlank(name) && !"null".equals(name)) {
             lambdaQueryWrapper.like(User::getName, name);
         }
+
         if(sexObj instanceof Integer) {
             lambdaQueryWrapper.eq(User::getSex, sexObj);
+        }
+
+        if(roleIdObj instanceof Integer) {
+            lambdaQueryWrapper.eq(User::getRoleId, roleIdObj);
         }
 
         IPage<User> result = userService.pageCC(page, lambdaQueryWrapper);
@@ -172,7 +184,15 @@ public class UserController {
                 .eq(User::getNo, user.getNo())
                 .eq(User::getPassword, user.getPassword())
                 .list();
-        return list.size() > 0 ? Result.suc(null, list.get(0)) : Result.fail();
+        if(list.size() > 0) {
+            User user1 = list.get(0);
+            List<Menu> menuList = menuService.lambdaQuery().like(Menu::getMenuRight, user1.getRoleId()).list();
+            HashMap res = new HashMap();
+            res.put("user", user1);
+            res.put("menuList", menuList);
+            return Result.suc(null, res);
+        }
+        return Result.fail();
     }
 
 

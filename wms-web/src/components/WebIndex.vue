@@ -10,7 +10,8 @@
       </el-header>
 
       <el-main style="height: 100%">
-          <WebMain></WebMain>
+<!--          <WebMain></WebMain>-->
+        <router-view></router-view>
       </el-main>
     </el-container>
   </el-container>
@@ -36,10 +37,9 @@
 <script>
 import WebAside from "@/components/WebAside";
 import WebHeader from "@/components/WebHeader";
-import WebMain from "@/components/WebMain";
 export default {
   name: "WebIndex",
-  components: {WebMain, WebHeader, WebAside},
+  components: { WebHeader, WebAside},
   methods: {
     doCollapse() {
       this.isCollapse = !this.isCollapse

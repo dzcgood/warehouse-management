@@ -161,4 +161,20 @@ public class UserController {
         return list.size() > 0 ? Result.suc(null, list) : Result.fail();
     }
 
+    /**
+     * 登录
+     * @param user
+     * @return
+     */
+    @PostMapping("login")
+    public Result login(@RequestBody User user) {
+        List<User> list = userService.lambdaQuery()
+                .eq(User::getNo, user.getNo())
+                .eq(User::getPassword, user.getPassword())
+                .list();
+        return list.size() > 0 ? Result.suc(null, list.get(0)) : Result.fail();
+    }
+
+
+
 }

@@ -9,7 +9,7 @@ function addNewRoute(menuList) {
     let routes = router.options.routes
     // console.log(routes)
     routes.forEach(routeItem => {
-        if (routeItem.path == "/Index") {
+        if (routeItem.path == "/WebIndex") {
             menuList.forEach(menu => {
                 let childRoute = {
                     path: '/' + menu.menuClick,
@@ -26,6 +26,8 @@ function addNewRoute(menuList) {
     })
 
     resetRouter()
+    console.log('routes')
+    console.log(routes)
     router.addRoutes(routes)
 }
 

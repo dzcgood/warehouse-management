@@ -175,14 +175,14 @@ export default {
 
         return item.id == row.storageId
       })
-      return temp && temp.name
+      return temp.name
     },
     formatType(row) {
       let temp = this.goodsTypeData.find(item => {
 
         return item.id == row.goodsTypeId
       })
-      return temp && temp.name
+      return temp.name
     },
     loadPost() {
       this.$axios.post(this.$httpUrl + '/goods/listPage', {

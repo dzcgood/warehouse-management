@@ -10,8 +10,20 @@
 // import WebIndex from "@/components/WebIndex";
 export default {
   name: 'App',
-  components: {
-    // WebIndex
+  data() {
+    return {
+      user: JSON.parse(sessionStorage.getItem('CurUser'))
+    }
+  },
+  watch: {
+    '$store.state.menu': {
+      handler(val, old) {
+        if(!old && this.user && this.user.no) {
+          this.$store.commit('setMenu', val)
+        }
+      },
+      immediate: true
+    }
   }
 }
 </script>

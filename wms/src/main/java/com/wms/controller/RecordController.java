@@ -55,6 +55,8 @@ public class RecordController {
         String name = (String)param.get("name");
         Object storageIdObj = param.get("storageId");
         Object goodsTypeIdObj = param.get("goodsTypeId");
+        Object roleIdObj = param.get("roleId");
+
 
         if(StringUtils.isNotBlank(name) && !"null".equals(name)) {
             queryWrapper.like("b.name", name);
@@ -66,6 +68,12 @@ public class RecordController {
 
         if(goodsTypeIdObj instanceof Integer) {
             queryWrapper.eq("d.id", goodsTypeIdObj);
+        }
+
+        // 根据权限等级查询数据
+        if(roleIdObj instanceof Integer && 2 == (Integer) roleIdObj) {
+            Object userIdObj = param.get("userId");
+            queryWrapper.eq("a.user_id", userIdObj);
         }
 
         IPage<Record> result = recordService.pageCC(page, queryWrapper);

@@ -22,9 +22,9 @@
       </el-select>
       <el-button type="primary" style="margin-left: 5px" @click="loadPost">查询</el-button>
       <el-button type="success" style="margin-left: 5px" @click="resetParam">重置</el-button>
-      <el-button type="primary" style="margin-left: 5px" @click="add">新增</el-button>
-      <el-button type="primary" style="margin-left: 5px" @click="inGoods">入库</el-button>
-      <el-button type="primary" style="margin-left: 5px" @click="outGoods">出库</el-button>
+      <el-button type="primary" style="margin-left: 5px" @click="add" v-if="user.roleId != 2">新增</el-button>
+      <el-button type="primary" style="margin-left: 5px" @click="inGoods" v-if="user.roleId != 2">入库</el-button>
+      <el-button type="primary" style="margin-left: 5px" @click="outGoods" v-if="user.roleId != 2">出库</el-button>
 
     </div>
     <!--    table-->
@@ -47,7 +47,7 @@
       <el-table-column prop="remark" label="备注">
       </el-table-column>
 
-      <el-table-column prop="operate" label="操作">
+      <el-table-column prop="operate" label="操作" v-if="user.roleId != 2">
         <template slot-scope="scope">
           <el-button type="success" size="small" @click="mod(scope.row)" style="margin-right: 5px">编辑</el-button>
           <el-popconfirm title="确定删除吗？" @confirm="del(scope.row.id)">

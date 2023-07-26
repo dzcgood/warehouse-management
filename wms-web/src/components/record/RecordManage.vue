@@ -69,6 +69,7 @@ export default {
   data() {
 
     return {
+      user: JSON.parse(sessionStorage.getItem("CurUser")),
       tableData: [],
       pageSize: 10,
       pageNum: 1,
@@ -126,7 +127,9 @@ export default {
         param: {
           name: this.name,
           storageId: this.storageId,
-          goodsTypeId: this.goodsTypeId
+          goodsTypeId: this.goodsTypeId,
+          roleId: this.user.roleId,
+          userId: this.user.id
         }
       })
           .then(res => res.data)

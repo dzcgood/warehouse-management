@@ -23,12 +23,16 @@
       <el-button type="primary" style="margin-left: 5px" @click="loadPost">查询</el-button>
       <el-button type="success" style="margin-left: 5px" @click="resetParam">重置</el-button>
       <el-button type="primary" style="margin-left: 5px" @click="add">新增</el-button>
+      <el-button type="primary" style="margin-left: 5px" @click="inGoods">入库</el-button>
+      <el-button type="primary" style="margin-left: 5px" @click="outGoods">出库</el-button>
 
     </div>
     <!--    table-->
     <el-table :data="tableData"
               :header-cell-style="{background: '#F2F5FC', color: '#555555'}"
               border
+              highlight-current-row
+              @current-change="selectCurrentChange"
     >
       <el-table-column prop="id" label="ID" width="60">
       </el-table-column>
@@ -88,7 +92,6 @@
           </el-col>
 
 
-
         </el-form-item>
         <el-form-item label="分类" prop="goodsTypeId">
           <el-col :span="20">
@@ -109,7 +112,7 @@
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-col :span="20">
-            <el-input v-model="form.remark" type="textarea"> </el-input>
+            <el-input v-model="form.remark" type="textarea"></el-input>
           </el-col>
         </el-form-item>
       </el-form>
@@ -118,12 +121,63 @@
     <el-button type="primary" @click="save">确 定</el-button>
   </span>
     </el-dialog>
+    <!--    入库界面-->
+    <el-dialog
+        title="出入库"
+        :visible.sync="inDialogVisible"
+        width="30%"
+        center>
+
+        <el-dialog
+            width="55%"
+            title="选择用户"
+            :visible.sync="innerVisible"
+            append-to-body>
+          <selectUser @doSelectUser="doSelectUser"></selectUser>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click="inDialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="confirmUser">确定</el-button>
+          </div>
+        </el-dialog>
+
+
+      <el-form ref="form1" :model="form1" :rules="rules1" label-width="80px">
+        <el-form-item label="物品名">
+          <el-col :span="20">
+            <el-input v-model="form1.goodsName" readonly></el-input>
+          </el-col>
+        </el-form-item>
+
+        <el-form-item label="数量" prop="count">
+          <el-col :span="20">
+            <el-input v-model="form1.count"></el-input>
+          </el-col>
+        </el-form-item>
+
+        <el-form-item label="申请人" prop="count">
+          <el-col :span="20">
+            <el-input v-model="tempUser.name" @click.native="selectUser"></el-input>
+          </el-col>
+        </el-form-item>
+        <el-form-item label="备注" prop="remark">
+          <el-col :span="20">
+            <el-input v-model="form1.remark" type="textarea"> </el-input>
+          </el-col>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+    <el-button @click="inDialogVisible = false">取 消</el-button>
+    <el-button type="primary" @click="doInGoods">确 定</el-button>
+  </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import SelectUser from "@/components/user/SelectUser";
 export default {
   name: "GoodsManage",
+  components: {SelectUser},
   data() {
     let checkCount = (rule, value, callback) => {
       if (value > 9999) {
@@ -133,6 +187,8 @@ export default {
       }
     };
     return {
+      tempUser: {},
+      user: JSON.parse(sessionStorage.getItem("CurUser")),
       tableData: [],
       pageSize: 10,
       pageNum: 1,
@@ -142,7 +198,10 @@ export default {
       goodsTypeData: [],
       storageId: '',
       goodsTypeId: '',
+      innerVisible: false,
       centerDialogVisible: false,
+      inDialogVisible: false,
+      currentRow: {},
       form: {
         id: '',
         name: '',
@@ -150,6 +209,15 @@ export default {
         goodsTypeId: '',
         count: 0,
         remark: '',
+      },
+      form1: {
+        goodsId: '',
+        userId: 13,
+        adminId: '',
+        goodsName: '',
+        count: '',
+        remark: '',
+        action: 1
       },
       rules: {
         name: [
@@ -166,10 +234,57 @@ export default {
           {pattern: /^[1-9][0-9*]{1,4}$/, message: '数量必须为正整数', trigger: 'blur'},
           {validator: checkCount, trigger: 'blur'}
         ]
+      },
+      rules1: {
+
       }
     }
   },
   methods: {
+    doSelectUser(val) {
+      console.log(val)
+      this.tempUser = val
+    },
+    confirmUser() {
+      this.form1.userId = this.tempUser.id
+      this.innerVisible = false
+    },
+    selectUser() {
+      this.innerVisible = true
+    },
+    selectCurrentChange(val) {
+      this.currentRow = val
+    },
+    inGoods() {
+      if(!this.currentRow.id) {
+        alert("请选择记录");
+        return;
+      }
+      this.inDialogVisible = true
+      // 异步，要先等表单创建出来再刷新值
+      this.$nextTick(() => {
+        this.resetInForm()
+      })
+      this.form1.goodsName = this.currentRow.name
+      this.form1.goodsId = this.currentRow.id
+      this.form1.adminId = this.user.id
+      this.form1.action = 1
+    },
+    outGoods() {
+      if(!this.currentRow.id) {
+        alert("请选择记录");
+        return;
+      }
+      this.inDialogVisible = true
+      // 异步，要先等表单创建出来再刷新值
+      this.$nextTick(() => {
+        this.resetInForm()
+      })
+      this.form1.goodsName = this.currentRow.name
+      this.form1.goodsId = this.currentRow.id
+      this.form1.adminId = this.user.id
+      this.form1.action = 2
+    },
     formatStorage(row) {
       let temp = this.storageData.find(item => {
 
@@ -262,6 +377,9 @@ export default {
     resetForm() {
       this.$refs.form.resetFields();
     },
+    resetInForm() {
+      this.$refs.form1.resetFields();
+    },
     doSave() {
       this.$axios.post(this.$httpUrl + '/goods/save', this.form)
           .then(res => res.data)
@@ -282,6 +400,7 @@ export default {
             }
           })
     },
+
     doMod() {
       this.$axios.post(this.$httpUrl + '/goods/mod', this.form)
           .then(res => res.data)
@@ -317,6 +436,26 @@ export default {
         }
       });
 
+    },
+    doInGoods() {
+      this.$axios.post(this.$httpUrl + '/record/save', this.form1)
+          .then(res => res.data)
+          .then(res => {
+            console.log(res)
+            if (res.code == 200) {
+              this.$message({
+                message: '操作成功',
+                type: 'success'
+              });
+              this.inDialogVisible = false
+              this.loadPost()
+            } else {
+              this.$message({
+                message: '操作失败',
+                type: 'error'
+              });
+            }
+          })
     },
     loadStorage() {
       this.$axios.get(this.$httpUrl + '/storage/list')

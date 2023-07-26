@@ -1,0 +1,294 @@
+<template>
+  <div>
+    <!--    查询-->
+    <div style="margin-bottom: 5px">
+      <el-input v-model="name" placeholder="请输入名字" suffix-icon="el-icon-search" style="width: 200px"
+                @keyup.enter.native="loadPost"></el-input>
+      <el-select v-model="sex" filterable clearable placeholder="请选择性别" style="margin-left: 5px">
+        <el-option
+            v-for="item in sexes"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+        </el-option>
+      </el-select>
+      <el-button type="primary" style="margin-left: 5px" @click="loadPost">查询</el-button>
+      <el-button type="success" style="margin-left: 5px" @click="resetParam">重置</el-button>
+      <el-button type="primary" style="margin-left: 5px" @click="add">新增</el-button>
+
+    </div>
+    <!--    table-->
+    <el-table :data="tableData"
+              :header-cell-style="{background: '#F2F5FC', color: '#555555'}"
+              border
+              highlight-current-row
+              @current-change="selectCurrentChange"
+    >
+      <el-table-column prop="id" label="ID" width="80">
+      </el-table-column>
+      <el-table-column prop="no" label="账号" width="180">
+      </el-table-column>
+      <el-table-column prop="name" label="姓名" width="180">
+      </el-table-column>
+      <el-table-column prop="age" label="年龄" width="100">
+      </el-table-column>
+      <el-table-column prop="sex" label="性别" width="100">
+        <template slot-scope="scope">
+          <el-tag
+              :type="scope.row.sex === 1 ? 'primary' : 'success'"
+              disable-transitions>{{ scope.row.sex === 1 ? '男' : '女' }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="roleId" label="角色" width="140">
+        <template slot-scope="scope">
+          <el-tag
+              :type="scope.row.roleId === 0 ? 'danger' : (scope.row.roleId === 1 ? 'primary' : 'success')"
+              disable-transitions>{{ scope.row.roleId === 0 ? '超级管理员' : (scope.row.roleId === 1 ? '管理员' : '用户') }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="phone" label="电话" width="130">
+      </el-table-column>
+    </el-table>
+    <!--    分页-->
+    <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="pageNum"
+        :page-sizes="[5, 10, 20, 30]"
+        :page-size="pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total">
+    </el-pagination>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "SelectUser",
+  data() {
+    let checkAge = (rule, value, callback) => {
+      if (value > 150) {
+        callback(new Error('年龄输入过大'));
+      } else {
+        callback();
+      }
+    };
+    let checkDuplicate = (rule, value, callback) => {
+      if (this.form.id) {
+        return callback();
+      }
+      this.$axios.get(this.$httpUrl + '/user/findByNo?no=' + this.form.no).then(res => res.data).then(res => {
+        if (res.code == 200) {
+          // 根据no查到了数据
+          callback(new Error('账号已经存在'));
+        } else {
+          callback()
+        }
+      })
+    };
+    return {
+      tableData: [],
+      pageSize: 10,
+      pageNum: 1,
+      total: 0,
+      name: '',
+      sex: null,
+      sexes: [{
+        value: 1,
+        label: '男'
+      }, {
+        value: 0,
+        label: '女'
+      }],
+      centerDialogVisible: false,
+      form: {
+        id: '',
+        no: '',
+        name: '',
+        password: '',
+        age: '',
+        phone: '',
+        sex: 0,
+        roleId: 2
+      },
+      rules: {
+        no: [
+          {required: true, message: '请输入账号', trigger: 'blur'},
+          {min: 3, max: 8, message: '长度在 3 到 8 个字符', trigger: 'blur'},
+          {validator: checkDuplicate, trigger: 'blur'}
+        ],
+        name: [
+          {required: true, message: '请输入名字', trigger: 'blur'},
+        ],
+        password: [
+          {required: true, message: '请输入密码', trigger: 'blur'},
+          {min: 3, max: 8, message: '长度在 3 到 8 个字符', trigger: 'blur'}
+        ],
+        age: [
+          {required: true, message: '请输入年龄', trigger: 'blur'},
+          {min: 1, max: 3, message: '长度在 1 到 3 个位', trigger: 'blur'},
+          {pattern: /^([1-9][0-9]*){1,3}$/, message: '年龄必须为正整数', trigger: 'blur'},
+          {validator: checkAge, trigger: 'blur'}
+        ],
+        phone: [
+          {required: true, message: '手机号不能为空', trigger: 'blur'},
+          {pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/, message: '请输入正确的手机号码', trigger: 'blur'}
+        ]
+      }
+    }
+  },
+  methods: {
+    selectCurrentChange(val) {
+      this.$emit("doSelectUser",val)
+    },
+    loadGet() {
+      this.$axios.get(this.$httpUrl + '/user/list')
+          .then(res => res.data)
+          .then(res => {
+            console.log(res)
+            this.tableData = res
+          })
+    },
+    loadPost() {
+      this.$axios.post(this.$httpUrl + '/user/listPageC1', {
+        pageSize: this.pageSize,
+        pageNum: this.pageNum,
+        param: {
+          name: this.name,
+          sex: this.sex,
+          roleId: 2
+        }
+      })
+          .then(res => res.data)
+          .then(res => {
+            console.log(res)
+            if (res.code == 200) {
+              this.tableData = res.data
+              this.total = res.total
+            } else {
+              alert('获取失败')
+            }
+          })
+    },
+    handleSizeChange(val) {
+      this.pageSize = val
+      this.pageNum = 1
+      this.loadPost()
+    },
+    handleCurrentChange(val) {
+      this.pageNum = val
+      this.loadPost()
+    },
+    resetParam() {
+      this.name = ''
+      this.sex = null
+    },
+    add() {
+      this.centerDialogVisible = true
+      // 异步，要先等表单创建出来再刷新值
+      this.$nextTick(() => {
+        this.resetForm()
+      })
+    },
+    mod(row) {
+      // 展示表单
+      this.centerDialogVisible = true
+      this.$nextTick(() => {
+        // 赋值到表单
+        this.form.id = row.id
+        this.form.no = row.no
+        this.form.name = row.name
+        this.form.password = row.password
+        this.form.age = row.age + ''
+        this.form.phone = row.phone
+        this.form.sex = row.sex + ''
+        this.form.roleId = row.roleId
+      })
+    },
+    del(id) {
+      this.$axios.get(this.$httpUrl + '/user/delete?id=' + id)
+          .then(res => res.data)
+          .then(res => {
+            console.log(res)
+            if (res.code == 200) {
+              this.$message({
+                message: '操作成功',
+                type: 'success'
+              });
+              this.loadPost()
+            } else {
+              this.$message({
+                message: '操作失败',
+                type: 'error'
+              });
+            }
+          })
+    },
+    resetForm() {
+      this.$refs.form.resetFields();
+    },
+    doSave() {
+      this.$axios.post(this.$httpUrl + '/user/save', this.form)
+          .then(res => res.data)
+          .then(res => {
+            console.log(res)
+            if (res.code == 200) {
+              this.$message({
+                message: '操作成功',
+                type: 'success'
+              });
+              this.centerDialogVisible = false
+              this.loadPost()
+            } else {
+              this.$message({
+                message: '操作失败',
+                type: 'error'
+              });
+            }
+          })
+    },
+    doMod() {
+      this.$axios.post(this.$httpUrl + '/user/mod', this.form)
+          .then(res => res.data)
+          .then(res => {
+            console.log(res)
+            if (res.code == 200) {
+              this.$message({
+                message: '操作成功',
+                type: 'success'
+              });
+              this.centerDialogVisible = false
+              this.loadPost()
+            } else {
+              this.$message({
+                message: '操作失败',
+                type: 'error'
+              });
+            }
+          })
+    },
+    save() {
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          if (this.form.id) {
+            this.doMod();
+          } else {
+            this.doSave();
+          }
+
+        } else {
+          console.log('error submit!!');
+          return false;
+        }
+      });
+
+    }
+  },
+  beforeMount() {
+    // this.loadGet()
+    this.loadPost()
+  }
+}
+</script>

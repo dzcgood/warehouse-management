@@ -1,6 +1,7 @@
 package com.wms.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import java.io.Serializable;
@@ -56,6 +57,13 @@ public class Record implements Serializable {
      * 备注
      */
     private String remark;
+
+    /**
+     * 1 : 入库
+     * 2 : 出库
+     */
+    @TableField(exist = false)
+    private Integer action;
 
 
 }

@@ -8,8 +8,10 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wms.common.QueryPageParam;
 import com.wms.common.Result;
+import com.wms.entity.Goods;
 import com.wms.entity.GoodsType;
 import com.wms.entity.Record;
+import com.wms.service.GoodsService;
 import com.wms.service.RecordService;
 import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,9 @@ import java.util.HashMap;
 public class RecordController {
     @Autowired
     RecordService recordService;
+
+    @Autowired
+    GoodsService goodsService;
 
     /**
      * 分页查询
@@ -65,5 +70,25 @@ public class RecordController {
 
         IPage<Record> result = recordService.pageCC(page, queryWrapper);
         return Result.suc(result.getTotal(), result.getRecords());
+    }
+
+    /**
+     * 新增
+     * @param record
+     * @return
+     */
+    @PostMapping("save")
+    public Result save(@RequestBody Record record) {
+        // 更新数量
+        Goods goods = goodsService.getById(record.getGoodsId());
+        Integer oldCount = goods.getCount();
+        Integer num = record.getCount();
+        if(record.getAction() == 2) {
+            num = -num;
+            record.setCount(num);
+        }
+        goods.setCount(oldCount + num);
+        goodsService.updateById(goods);
+        return recordService.save(record) ? Result.suc(null, null) : Result.fail();
     }
 }
